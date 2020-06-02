@@ -1,0 +1,27 @@
+#searchboxid{
+   position: relative;
+}
+
+#searchboxbackground{
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    opacity: 0.8;
+}
+
+#searchcontainer{
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 20px;
+}
+
+.searchbox{
+    z-index: 400;
+    position: absolute;
+    left:0;
+    top:0;
+    right:0;
+    overflow: visible;
+    height: 0;
+}

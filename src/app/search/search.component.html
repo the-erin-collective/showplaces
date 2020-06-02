@@ -1,5 +1,11 @@
-<div>
-    <label>name:
-        <input [(ngModel)]="searchbox" placeholder="search..."/>
-    </label>
-</div>
+
+<div class="searchbox">
+    <div id="searchcontainer" class="uk-border-pill">
+        <div class="uk-search uk-search-large">
+            <div id=searchboxbackground class="uk-border-pill"></div>
+            <a href="javascript:" uk-search-icon></a>
+            <input id="searchboxid" class="uk-search-input" type="search" placeholder="Search...">
+        </div>
+        <span uk-icon="icon: location" (click)="centerOnGeolocation()"></span>
+    </div>
+</div> 
