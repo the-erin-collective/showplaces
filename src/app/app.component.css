@@ -47,16 +47,6 @@
   height: 0;
 }
 
-/*.searchbox{
-   z-index: 400;
-   position: absolute;
-   left:0;
-   top:0;
-   right:0;
-   overflow: visible;
-   height: 0;
-}*/
-
 #searchcontent{
   width: 100%;
 }
@@ -91,15 +81,79 @@
   box-shadow: 15px 15px 14px -10px rgba(0,0,0,0.24);
 }
 
-.visited{
-  width: 300px;
+#visitedbox{
+  width: 350px;
   height: unset;
   top: 150px;
   padding: 10px;
+  opacity: 0.8;
 }
 
 .visitedheader{
-  font-weight: bold;
   font-size: 20px;
   margin-left: 5px;
+}
+
+.visitedlistcontainer{
+  padding: 0;
+}
+
+#imagesbox{
+  width: 315px;
+  height: unset;
+  top: 150px;
+  right: 0;
+  left: unset;
+  padding: 10px;
+  opacity: 0.8;
+  overflow: hidden;
+  max-height: 500px;
+}
+
+.imagesheader{
+  padding-left: 15px;
+}
+
+.imageloadingtext{
+  font-size: 14px;
+  text-align: center;
+  padding-top: 25px;
+  font-weight: 500;
+}
+
+#authormessage{
+  height: unset;
+  left: unset;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  opacity: 0.8;
+  font-weight: 100;
+  cursor: help;
+}
+
+.clickEffect{
+	position:fixed;
+	box-sizing:border-box;
+	border-style:solid;
+	border-color:#000000;
+	border-radius:50%;
+	animation:clickEffect 0.4s ease-out;
+	z-index:99999;
+}
+@keyframes clickEffect{
+	0%{
+		opacity:1;
+		width:0.5em; height:0.5em;
+		margin:-0.25em;
+		border-width:0.5rem;
+	}
+	100%{
+		opacity:0.2;
+		width:15em; height:15em;
+		margin:-7.5em;
+    border-width:0.03rem;
+    left: 50%;
+    top: 50%;
+	}
 }

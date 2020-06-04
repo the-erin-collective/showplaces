@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener  } from '@angular/core';
 import * as L from 'leaflet';
 import { NominatimJS }  from '@owsas/nominatim-js';
 import { FlickrAPIService } from './flickrapi.service';
@@ -19,13 +19,31 @@ export class AppComponent {
   showToast: boolean = false;
   fadeOutToast: boolean = false;
   popupText: string = "Welcome.";
+  currentAddressString = "";
+  imagesLoadingText = "";
   messageQueue: any = [];
+  maxRecentlyVisistedAddresses = 5;
+  maxPhotos = 5;
   toastMessageDurationSeconds = 5;
   start_latitude: number = -29.8167096;
   start_longitude: number = 30.9508673;
   lastcoordsStorageName = 'lastcoords';
   recentlyVisistedStorageName = 'history';
   recentlyVisited = [];
+  currentImages = [];
+  showPing = false;
+  clickEffectLeft = "0";
+  clickEffectTop = "0";
+ /* @HostListener('document:click', ['$event'])
+  onMouseClick(event: any) {    
+    this.showPing = true;
+    this.clickEffectLeft =  event.clientX;
+    this.clickEffectTop = event.clientY;
+    console.log("click at x:" + event.clientX + " y:" + event.clientY );
+  }*/
+  onMouseClickAnimEnd(){
+    this.showPing = false;
+  }
   ngAfterViewInit(){
     let lastCoords = JSON.parse(localStorage.getItem(this.lastcoordsStorageName));
     if(lastCoords != null)
@@ -37,6 +55,7 @@ export class AppComponent {
       center: [ this.start_latitude, this.start_longitude ],
       zoom: 8
     });
+
     this.tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -45,13 +64,25 @@ export class AppComponent {
     this.tiles.addTo(this.map);
     this.map.zoomControl.setPosition('bottomleft');
     
+    this.gotoGeoLocation({lat: this.start_latitude, lng: this.start_longitude});
+
     this.map.on('click', (args) =>  {
+      this.showPing = true;
+      this.clickEffectLeft =  args.originalEvent.clientX;
+      this.clickEffectTop = args.originalEvent.clientY;
+      console.log("click at x:" + args.originalEvent.clientX + " y:" + args.originalEvent.clientY );
       this.gotoGeoLocation(args.latlng);
     });
 
-    let visited = JSON.parse(localStorage.getItem(this.recentlyVisistedStorageName));
-    if(visited != null)
-      this.recentlyVisited = visited;
+    this.map.on('zoomstart', () =>  {
+      this.currentAddressString = "";
+      this.currentImages = [];
+    })
+    
+    this.map.on('dragstart', () =>  {
+      this.currentAddressString = "";
+      this.currentImages = [];
+    })
   };
   centerOnGeolocation(){
     if(!('geolocation' in navigator)){
@@ -69,12 +100,51 @@ export class AppComponent {
       lon: latlong.lon
     }).toPromise().then(results => { 
       console.log(results);
+      this.currentImages = [];
+      if(results.photos.photo.length == 0){
+        this.imagesLoadingText = "No images found.";
+        this.showToastMessage("No images found at this location.");
+      }else{
+        this.imagesLoadingText = "";
+      }
+      for(let i = 0; i < (this.maxPhotos < results.photos.photo.length ? this.maxPhotos : results.photos.photo.length); i++){
+        let newPhoto = this.getRandomPhotoFromList(results.photos.photo, this.getPhotoIdList(this.currentImages) );
+        this.currentImages.push(newPhoto);
+        console.log(newPhoto);
+      };
     }).catch(error => { 
       console.log(error);
-      this.showToastMessage("Image service unavailable.");
     });
-  }
+  };
+  getPhotoIdList(images){
+    let photoIds = [];
+    images.forEach(image => {
+      photoIds.push(image.id);
+    });
+    return photoIds;
+  };
+  getRandomPhotoFromList(photos, exclusionList){
+    let randomIndex = Math.floor(Math.random() * photos.length);
+    let randomPhoto = photos[randomIndex];
+    if(exclusionList == null)
+      exclusionList = [];
+    let alreadyExists = false; 
+    exclusionList.forEach(photoid => {
+     if(photoid == randomPhoto.id)
+      alreadyExists = true;
+    });
+    if(alreadyExists && photos.length > 1)
+    {
+      photos.filter(photo => photo.id !== randomPhoto.id);
+      return this.getRandomPhotoFromList(photos, exclusionList);
+    }
+    else
+      return randomPhoto;
+  };
   gotoGeoLocation(latlng){
+    this.currentAddressString = "";
+    this.imagesLoadingText = "";
+    this.currentImages = [];
     localStorage.setItem(this.lastcoordsStorageName, JSON.stringify(latlng));
     console.log(JSON.stringify(latlng));
     this.map.panTo(latlng, this.map.getZoom());
@@ -85,14 +155,41 @@ export class AppComponent {
       console.log(results);
       if(results == null || results.address == null)
         return;
-      this.showToastMessage(this.getOneLineAddress(results.address));
-      this.recentlyVisited.push({ timestamp : new Date().getDate(), geolocation : { latitude : latlng.lat, longitude : latlng.lng}, address : results.address });
+      let oneLineAddress = this.getOneLineAddress(results.address);
+      this.currentAddressString = oneLineAddress;
+      this.showToastMessage(oneLineAddress);
+      if(!this.isGeolocationInVisitList(latlng)){
+        if(this.recentlyVisited.length == this.maxRecentlyVisistedAddresses)
+          this.recentlyVisited.shift();
+        this.recentlyVisited.push(this.createVisitModel(latlng, results.address));
+        localStorage.setItem(this.recentlyVisistedStorageName, JSON.stringify(this.recentlyVisited));
+      };
+      this.imagesLoadingText = "Loading images...";
       this.findGeoImages({ lat: latlng.lat, lon: latlng.lng });
     }).catch(error => {
       console.log(error);
       this.showToastMessage("Location service unavailable.");
     });
   };
+  isGeolocationInVisitList(latlng): boolean{
+    let alreadyVisisted = false;
+    this.recentlyVisited.forEach(element => {
+      if(element.geolocation.latitude == latlng.lat && element.geolocation.longitude == latlng.lng)
+        alreadyVisisted = true;
+    });
+    return alreadyVisisted;
+  };
+  createVisitModel(latlng, address){
+     return { 
+       timestamp : new Date().getDate(), 
+       geolocation : { 
+         latitude : latlng.lat,
+         longitude : latlng.lng
+        }, 
+        addressstring : this.getOneLineAddress(address),
+        fulladdress : address
+      };
+  }
   getOneLineAddress(address):string{
     let addressArr = [];
     if(address.road && address.road != "")
@@ -138,5 +235,8 @@ export class AppComponent {
     } else {
       console.log('geolocation unavailable');
     }
+    let visited = JSON.parse(localStorage.getItem(this.recentlyVisistedStorageName));
+    if(visited != null)
+      this.recentlyVisited = visited;
   }
 }

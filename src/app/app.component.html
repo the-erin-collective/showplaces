@@ -16,14 +16,27 @@
   </div>
 </div> 
 
-<div [style.display]="recentlyVisited != null && recentlyVisited.length > 0 ? 'block' : 'none'" class="visited uiovermap uk-card uk-card-default">
+<div id="visitedbox" [style.display]="(recentlyVisited != null && recentlyVisited.length > 0) ? 'block' : 'none'" class="uiovermap addshadow uk-card uk-card-default">
   <div class="visitedheader">recent visits...</div>
-  <ul>
-    <app-visited *ngFor="let visited of recentlyVisited">
+  <ul class="visitedlistcontainer">
+    <app-visited *ngFor="let visited of recentlyVisited.reverse()" [visited]="visited" (revisit)="gotoGeoLocation($event)">
     </app-visited>
   </ul>
 </div>
 
+<div id="imagesbox" [style.display]="(currentAddressString != null && currentAddressString.length > 0) ? 'block' : 'none'" class="uiovermap addshadow uk-card uk-card-default">
+  <div class="imagesheader">{{ currentAddressString }}</div>
+  <div class="imageloadingtext" [style.display]="(imagesLoadingText != null && imagesLoadingText.length > 0) ? 'block' : 'none'">{{ imagesLoadingText }}</div>
+  <ul class="imageslistcontainer">
+    <app-images *ngFor="let image of currentImages" [image]="image" >
+    </app-images>
+  </ul>
+</div>
+
 <div [class.uiovermap]="true" [ngClass]="{'uk-animation-fade' : !fadeOutToast, 'uk-animation-fade uk-animation-reverse' : fadeOutToast }" [style.display]="showToast ? 'block' : 'none'" id="popup"><div class="uk-border-pill popuptext addshadow">{{ popupText }}</div></div>
+
+<div [class.uiovermap]="true" id="authormessage"><a href='https://github.com/the-erin-collective/showplaces'>showplaces</a> by erin</div>
+
+<div [class.uiovermap]="true" (animationend)="onMouseClickAnimEnd()" [style.left]="clickEffectLeft + 'px'" [style.top]="clickEffectTop + 'px'" [class.clickEffect]="showPing" id="ping" [style.display]="showPing ? 'block' : 'none'"></div>
 
 <router-outlet></router-outlet>
