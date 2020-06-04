@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SearchService } from './search.service';
+import { FlickrAPIService } from './flickrapi.service';
 
-describe('SearchService', () => {
-  let service: SearchService;
+describe('FlickrapiService', () => {
+  let service: FlickrAPIService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SearchService);
+    service = TestBed.inject(FlickrAPIService);
   });
 
   it('should be created', () => {

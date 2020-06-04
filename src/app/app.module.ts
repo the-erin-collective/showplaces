@@ -5,17 +5,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { MapComponent } from './map/map.component';
-import { SearchComponent } from './search/search.component';
+import { HttpClientModule  } from '@angular/common/http';
+import { VisitedComponent } from './visited/visited.component';
 
 @NgModule({
-  declarations: [AppComponent, MapComponent, SearchComponent],
+  declarations: [AppComponent, VisitedComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule],
+    BrowserAnimationsModule,
+    HttpClientModule ],
   providers: [],
-  bootstrap: [AppComponent, MapComponent, SearchComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
