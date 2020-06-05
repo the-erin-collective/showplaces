@@ -37,7 +37,7 @@ export class FlickrAPIService {
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
     return this.http.get(url.toJSON());
   };
-  getSizes(params):any{ // query
+  getSizes(params):any{ 
     params.format = params.format || this.format;
     params.api_key = params.api_key || this.apikey;
     params.nojsoncallback = params.nojsoncallback || this.nojsoncallback;
