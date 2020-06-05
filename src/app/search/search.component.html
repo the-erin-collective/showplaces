@@ -1,1 +1,15 @@
-<p>search works!</p>
+<div id="searchcontainer" class="uk-border-pill">
+    <div id="searchcontent" class="uk-search uk-search-large">
+        <div id=searchboxbackground class="uk-border-pill"></div>
+        <a href="javascript:" uk-search-icon></a>
+        <input id="searchboxid" class="uk-search-input uk-border-pill addshadow" (input)="textupdated($event)" (keydown.enter)="search($event)" [(ngModel)]="inputvalue" [ngModelOptions]="{standalone: true}" type="search" placeholder="{{ placeholderText }}">
+    </div>
+    <span uk-icon="icon: location; ratio: 2;" (click)="centerOnGeolocation()" id="geolocatebutton"></span>
+    <div id="suggestionbox">
+        <ul class="suggestioncontainer">
+            <li *ngFor="let suggestion of suggestions" (click)="onSuggestionClicked(suggestion)">
+                {{ suggestion.display_name }}
+            </li>
+          </ul>
+    </div>
+</div>

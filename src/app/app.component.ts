@@ -31,16 +31,11 @@ export class AppComponent {
   recentlyVisistedStorageName = 'history';
   recentlyVisited = [];
   currentImages = [];
+  currentSuggestions = [];
   showPing = false;
   clickEffectLeft = "0";
   clickEffectTop = "0";
- /* @HostListener('document:click', ['$event'])
-  onMouseClick(event: any) {    
-    this.showPing = true;
-    this.clickEffectLeft =  event.clientX;
-    this.clickEffectTop = event.clientY;
-    console.log("click at x:" + event.clientX + " y:" + event.clientY );
-  }*/
+  searchPlaceholderText = "Search...";
   onMouseClickAnimEnd(){
     this.showPing = false;
   }
@@ -77,13 +72,40 @@ export class AppComponent {
     this.map.on('zoomstart', () =>  {
       this.currentAddressString = "";
       this.currentImages = [];
+      this.currentSuggestions = [];
     })
     
     this.map.on('dragstart', () =>  {
       this.currentAddressString = "";
       this.currentImages = [];
+      this.currentSuggestions = [];
     })
   };
+  searchAddress(searchText){
+    NominatimJS.search({ q : searchText, limit : 1}).then(results => {
+      if(results == null)
+        return;
+      if(results.length == 0)
+      {
+        this.showToastMessage("Address not found.");
+        return;
+      } 
+      console.log("search result: " + JSON.stringify(results));
+      let thisresult = results[0];
+      this.gotoGeoLocation({lat: thisresult.lat, lng: thisresult.lon});
+    });
+  }
+  suggestAddress(suggest){
+    this.currentSuggestions = [];
+    if(suggest == "")
+      return;
+    NominatimJS.search({ q : suggest, limit : 5}).then(results => {
+      this.currentSuggestions = results;
+    });
+  }
+  onSuggestionChosen(suggestion){
+    this.gotoGeoLocation({lat: suggestion.lat, lng: suggestion.lon});
+  }
   centerOnGeolocation(){
     if(!('geolocation' in navigator)){
       this.showToastMessage("Unable to get geolocation from browser.");
@@ -145,6 +167,7 @@ export class AppComponent {
     this.currentAddressString = "";
     this.imagesLoadingText = "";
     this.currentImages = [];
+    this.currentSuggestions = [];
     localStorage.setItem(this.lastcoordsStorageName, JSON.stringify(latlng));
     console.log(JSON.stringify(latlng));
     this.map.panTo(latlng, this.map.getZoom());

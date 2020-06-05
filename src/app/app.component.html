@@ -5,17 +5,6 @@
   </div>
 </div>
 
-<div class="searchbox uiovermap">
-  <div id="searchcontainer" class="uk-border-pill">
-      <div id="searchcontent" class="uk-search uk-search-large">
-          <div id=searchboxbackground class="uk-border-pill"></div>
-          <a href="javascript:" uk-search-icon></a>
-          <input id="searchboxid" class="uk-search-input uk-border-pill addshadow" type="search" placeholder="Search...">
-      </div>
-      <span uk-icon="icon: location; ratio: 2;" (click)="centerOnGeolocation()" id="geolocatebutton"></span>
-  </div>
-</div> 
-
 <div id="visitedbox" [style.display]="(recentlyVisited != null && recentlyVisited.length > 0) ? 'block' : 'none'" class="uiovermap addshadow uk-card uk-card-default">
   <div class="visitedheader">recent visits...</div>
   <ul class="visitedlistcontainer">
@@ -32,6 +21,9 @@
     </app-images>
   </ul>
 </div>
+
+<app-search class="searchbox uiovermap" [suggestions]="currentSuggestions" [placeholderText]="searchPlaceholderText" (geolocate)="centerOnGeolocation()" (onsearch)="searchAddress($event)" (suggest)="suggestAddress($event)" (choose)="onSuggestionChosen($event)" >
+</app-search> 
 
 <div [class.uiovermap]="true" [ngClass]="{'uk-animation-fade' : !fadeOutToast, 'uk-animation-fade uk-animation-reverse' : fadeOutToast }" [style.display]="showToast ? 'block' : 'none'" id="popup"><div class="uk-border-pill popuptext addshadow">{{ popupText }}</div></div>
 
