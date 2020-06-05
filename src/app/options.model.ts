@@ -5,5 +5,4 @@ export class AppOptions {
   toastMessageDurationSeconds: number = 5;
   lastcoordsStorageName: string = 'lastcoords';
   recentlyVisistedStorageName: string = 'history';
-  searchPlaceholderText: string = "Search...";
 }
