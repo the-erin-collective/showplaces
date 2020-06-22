@@ -1,6 +1,6 @@
 import { Component, HostListener  } from '@angular/core';
 import * as L from 'leaflet';
-import { NominatimJS }  from '@owsas/nominatim-js';
+import { NominatimJS }  from './nominatim-js.js';
 import { FlickrAPIService } from './flickrapi.service';
 import { AppOptions } from './options.model';
 

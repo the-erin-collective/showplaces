@@ -19,7 +19,6 @@
     "@angular/platform-browser": "~9.1.9",
     "@angular/platform-browser-dynamic": "~9.1.9",
     "@angular/router": "~9.1.9",
-    "@owsas/nominatim-js": "^1.0.1",
     "cross-fetch": "^3.0.4",
     "isomorphic-fetch": "^2.2.1",
     "leaflet": "^1.6.0",
